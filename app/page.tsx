@@ -1,69 +1,98 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ProductCard } from "@/components/product-card";
+import { categories, getCategoryCounts, products } from "@/lib/products";
+
+function pickFeatured(count: number) {
+  const seen = new Set<string>();
+  const featured = [];
+  for (const p of products) {
+    if (seen.has(p.categorySlug)) continue;
+    seen.add(p.categorySlug);
+    featured.push(p);
+    if (featured.length >= count) break;
+  }
+  return featured;
+}
 
 export default function Home() {
+  const counts = getCategoryCounts();
+  const topCategories = [...categories]
+    .sort((a, b) => (counts.get(b.slug) ?? 0) - (counts.get(a.slug) ?? 0))
+    .slice(0, 6)
+    .map((c) => ({
+      ...c,
+      count: counts.get(c.slug) ?? 0,
+      image: products.find((p) => p.categorySlug === c.slug)?.images[0],
+    }));
+
+  const featured = pickFeatured(8);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div>
+      <section className="border-b border-border bg-muted/40">
+        <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-6 py-20">
+          <span className="text-sm uppercase tracking-[0.3em] text-accent">
+            Fashion jewelry
+          </span>
+          <h1 className="max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">
+            Gold plated pieces for everyday elegance
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="max-w-xl text-foreground/70">
+            Necklaces, earrings, bracelets and rings designed to layer,
+            stack, and stand out.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/shop"
+            className="mt-4 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Shop the collection
+          </Link>
         </div>
-      </main>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16">
+        <h2 className="mb-6 text-xl font-semibold">Shop by category</h2>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+          {topCategories.map((c) => (
+            <Link
+              key={c.slug}
+              href={`/shop?category=${c.slug}`}
+              className="group flex flex-col items-center gap-2 text-center"
+            >
+              <div className="relative aspect-square w-full overflow-hidden rounded-full border border-border bg-muted">
+                {c.image && (
+                  <Image
+                    src={c.image}
+                    alt={c.name}
+                    fill
+                    sizes="150px"
+                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                )}
+              </div>
+              <span className="text-sm font-medium">{c.name}</span>
+              <span className="text-xs text-foreground/50">
+                {c.count} items
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Best sellers</h2>
+          <Link href="/shop" className="text-sm text-accent hover:underline">
+            View all {products.length} products →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {featured.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
