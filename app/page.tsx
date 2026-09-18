@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
 import { categories, getCategoryCounts, products } from "@/lib/products";
@@ -19,62 +18,45 @@ export default function Home() {
   const counts = getCategoryCounts();
   const topCategories = [...categories]
     .sort((a, b) => (counts.get(b.slug) ?? 0) - (counts.get(a.slug) ?? 0))
-    .slice(0, 6)
-    .map((c) => ({
-      ...c,
-      count: counts.get(c.slug) ?? 0,
-      image: products.find((p) => p.categorySlug === c.slug)?.images[0],
-    }));
+    .slice(0, 6);
 
   const featured = pickFeatured(8);
 
   return (
     <div>
-      <section className="border-b border-border bg-muted/40">
-        <div className="mx-auto flex max-w-6xl flex-col items-start gap-4 px-6 py-20">
-          <span className="text-sm uppercase tracking-[0.3em] text-accent">
-            Fashion jewelry
-          </span>
+      <section className="border-b border-border">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-6 py-24 text-center">
           <h1 className="max-w-2xl text-4xl font-semibold leading-tight sm:text-5xl">
-            Gold plated pieces for everyday elegance
+            Gold plated jewelry for everyday elegance
           </h1>
           <p className="max-w-xl text-foreground/70">
             Necklaces, earrings, bracelets and rings designed to layer,
             stack, and stand out.
           </p>
-          <Link
-            href="/shop"
-            className="mt-4 rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
-          >
-            Shop the collection
-          </Link>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/shop"
+              className="rounded-full bg-accent px-6 py-3 text-sm font-medium text-accent-foreground transition-opacity hover:opacity-90"
+            >
+              Ver catálogo
+            </Link>
+            <Link
+              href="/shop"
+              className="rounded-full border border-border px-6 py-3 text-sm font-medium transition-colors hover:border-accent"
+            >
+              Comprar ahora
+            </Link>
+          </div>
         </div>
-      </section>
 
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <h2 className="mb-6 text-xl font-semibold">Shop by category</h2>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
+        <div className="mx-auto flex max-w-6xl flex-wrap justify-center gap-2 px-6 pb-10">
           {topCategories.map((c) => (
             <Link
               key={c.slug}
               href={`/shop?category=${c.slug}`}
-              className="group flex flex-col items-center gap-2 text-center"
+              className="rounded-full border border-border px-4 py-2 text-sm transition-colors hover:border-accent"
             >
-              <div className="relative aspect-square w-full overflow-hidden rounded-full border border-border bg-muted">
-                {c.image && (
-                  <Image
-                    src={c.image}
-                    alt={c.name}
-                    fill
-                    sizes="150px"
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                  />
-                )}
-              </div>
-              <span className="text-sm font-medium">{c.name}</span>
-              <span className="text-xs text-foreground/50">
-                {c.count} items
-              </span>
+              {c.name}
             </Link>
           ))}
         </div>
