@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { categories, getCategoryCounts } from "@/lib/products";
 
@@ -10,8 +11,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4">
-        <Link href="/" className="text-xl font-semibold tracking-widest">
-          VALMAUR
+        <Link href="/" className="shrink-0">
+          <Image src="/logo.jpg" alt="Valmaur Products" width={56} height={56} priority className="h-14 w-14 object-contain" />
         </Link>
         <nav className="hidden items-center gap-6 text-sm text-foreground/70 md:flex">
           {topCategories.map((c) => (
